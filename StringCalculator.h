@@ -15,6 +15,8 @@ private:
     std::string getNumberString(const std::string& input);
     int sumNumbers(const std::vector<int>& numbers);
     void validateNumbers(const std::vector<int>& numbers);
+    std::vector<int> findNegativeNumbers(const std::vector<int>& numbers);
+    void throwIfNegatives(const std::vector<int>& negatives);
     int toInt(const std::string& number);
     std::vector<int> filterLargeNumbers(const std::vector<int>& numbers);
 };
