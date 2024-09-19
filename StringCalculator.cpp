@@ -65,15 +65,25 @@ std::vector<int> StringCalculator::parseNumbers(const std::string& numbers, cons
     return result;
 }
 
-// Validate numbers and throw an exception for negatives
+// Validates numbers and checks for negatives
 void StringCalculator::validateNumbers(const std::vector<int>& numbers) {
+    std::vector<int> negatives = findNegativeNumbers(numbers);
+    throwIfNegatives(negatives);
+}
+
+// Finds all negative numbers in the list
+std::vector<int> StringCalculator::findNegativeNumbers(const std::vector<int>& numbers) {
     std::vector<int> negatives;
     for (int num : numbers) {
         if (num < 0) {
             negatives.push_back(num);
         }
     }
+    return negatives;
+}
 
+// Throws an exception if there are negative numbers
+void StringCalculator::throwIfNegatives(const std::vector<int>& negatives) {
     if (!negatives.empty()) {
         std::string errorMsg = "negatives not allowed: ";
         for (int neg : negatives) {
