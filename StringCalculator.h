@@ -10,15 +10,20 @@ public:
     int add(const std::string& numbers);
 
 private:
-    std::vector<int> parseNumbers(const std::string& numbers, const std::string& delimiter);
-    std::string getCustomDelimiter(const std::string& input);
-    std::string getNumberString(const std::string& input);
-    int sumNumbers(const std::vector<int>& numbers);
-    void validateNumbers(const std::vector<int>& numbers);
-    std::vector<int> findNegativeNumbers(const std::vector<int>& numbers);
-    void throwIfNegatives(const std::vector<int>& negatives);
+    std::string delimiter = ",|\n";  // Default delimiters
+    std::string numberString;        // Holds the part of the input with numbers
+
+    std::vector<int> parsedNumbers;  // Parsed list of numbers
+
+    void parseInput(const std::string& input);
+    void setCustomDelimiter(const std::string& input);
+    void extractNumberString(const std::string& input);
+    void parseNumbers();
+    void validateNumbers();
+    void checkForNegatives();
+    std::vector<int> filterLargeNumbers();
     int toInt(const std::string& number);
-    std::vector<int> filterLargeNumbers(const std::vector<int>& numbers);
+    int sumNumbers();
 };
 
 #endif

@@ -2,46 +2,56 @@
 #include <sstream>
 #include <algorithm>
 #include <numeric>
-#include <regex>
 
 // Adds up numbers from the input string
 int StringCalculator::add(const std::string& numbers) {
     if (numbers.empty()) return 0;
 
-    std::string delimiter = ",|\n";
-    std::string input = numbers;
+    // Parse input and extract numbers and delimiters
+    parseInput(numbers);
+    
+    // Parse and filter numbers
+    parseNumbers();
+    validateNumbers();
+    
+    // Filter large numbers
+    parsedNumbers = filterLargeNumbers();
 
-    // Handle custom delimiters
-    if (numbers.substr(0, 2) == "//") {
-        delimiter = getCustomDelimiter(numbers);
-        input = getNumberString(numbers);
-    }
-
-    std::vector<int> nums = parseNumbers(input, delimiter);
-    validateNumbers(nums);
-
-    nums = filterLargeNumbers(nums);
-
-    return sumNumbers(nums);
+    // Return the sum
+    return sumNumbers();
 }
 
-// Get custom delimiter from input
-std::string StringCalculator::getCustomDelimiter(const std::string& input) {
-    std::regex customDelimRegex("//(\\[.*?\\])+\n");
-    std::smatch match;
-    if (std::regex_search(input, match, customDelimRegex)) {
-        std::string customDelimiters = match.str();
-        customDelimiters.erase(0, 2);  // Remove the "//"
-        customDelimiters.pop_back();   // Remove the "\n"
-        std::regex escapeRegex(R"([\[|\]])");
-        return std::regex_replace(customDelimiters, escapeRegex, "");
+// Parse the input string to set delimiter and number string
+void StringCalculator::parseInput(const std::string& input) {
+    if (input.substr(0, 2) == "//") {
+        setCustomDelimiter(input);
+        extractNumberString(input);
+    } else {
+        numberString = input;
     }
-    return input.substr(2, input.find("\n") - 2);
+}
+
+// Set custom delimiter if provided
+void StringCalculator::setCustomDelimiter(const std::string& input) {
+    size_t newlinePos = input.find("\n");
+    std::string delimiterPart = input.substr(2, newlinePos - 2);
+
+    // Handle case with multiple delimiters between square brackets
+    if (delimiterPart[0] == '[') {
+        delimiter.clear();
+        size_t startPos = 1, endPos = 0;
+        while ((endPos = delimiterPart.find(']', startPos)) != std::string::npos) {
+            delimiter += delimiterPart.substr(startPos, endPos - startPos);
+            startPos = endPos + 2;  // skip past "][" or end
+        }
+    } else {
+        delimiter = delimiterPart;  // Single delimiter case
+    }
 }
 
 // Extract the part of the string with numbers, excluding the delimiter line
-std::string StringCalculator::getNumberString(const std::string& input) {
-    return input.substr(input.find("\n") + 1);
+void StringCalculator::extractNumberString(const std::string& input) {
+    numberString = input.substr(input.find("\n") + 1);
 }
 
 // Converts string to an integer
@@ -49,41 +59,38 @@ int StringCalculator::toInt(const std::string& number) {
     return std::stoi(number);
 }
 
-// Parses input string into vector of integers
-std::vector<int> StringCalculator::parseNumbers(const std::string& numbers, const std::string& delimiter) {
-    std::vector<int> result;
-    std::regex delimRegex(delimiter);
-    std::sregex_token_iterator iter(numbers.begin(), numbers.end(), delimRegex, -1);
-    std::sregex_token_iterator end;
+// Parses the number string into a vector of integers
+void StringCalculator::parseNumbers() {
+    parsedNumbers.clear();
+    size_t pos = 0, startPos = 0;
 
-    while (iter != end) {
-        std::string token = *iter++;
+    while ((pos = numberString.find_first_of(delimiter, startPos)) != std::string::npos) {
+        std::string token = numberString.substr(startPos, pos - startPos);
         if (!token.empty()) {
-            result.push_back(toInt(token));
+            parsedNumbers.push_back(toInt(token));
         }
+        startPos = pos + 1;
     }
-    return result;
+
+    if (startPos < numberString.length()) {
+        parsedNumbers.push_back(toInt(numberString.substr(startPos)));
+    }
 }
 
-// Validates numbers and checks for negatives
-void StringCalculator::validateNumbers(const std::vector<int>& numbers) {
-    std::vector<int> negatives = findNegativeNumbers(numbers);
-    throwIfNegatives(negatives);
+// Validate numbers, checking for negative values
+void StringCalculator::validateNumbers() {
+    checkForNegatives();
 }
 
-// Finds all negative numbers in the list
-std::vector<int> StringCalculator::findNegativeNumbers(const std::vector<int>& numbers) {
+// Check for negative numbers and throw an exception if any are found
+void StringCalculator::checkForNegatives() {
     std::vector<int> negatives;
-    for (int num : numbers) {
+    for (int num : parsedNumbers) {
         if (num < 0) {
             negatives.push_back(num);
         }
     }
-    return negatives;
-}
 
-// Throws an exception if there are negative numbers
-void StringCalculator::throwIfNegatives(const std::vector<int>& negatives) {
     if (!negatives.empty()) {
         std::string errorMsg = "negatives not allowed: ";
         for (int neg : negatives) {
@@ -93,14 +100,14 @@ void StringCalculator::throwIfNegatives(const std::vector<int>& negatives) {
     }
 }
 
-// Sums up numbers
-int StringCalculator::sumNumbers(const std::vector<int>& numbers) {
-    return std::accumulate(numbers.begin(), numbers.end(), 0);
+// Filters out numbers greater than 1000
+std::vector<int> StringCalculator::filterLargeNumbers() {
+    std::vector<int> filtered;
+    std::copy_if(parsedNumbers.begin(), parsedNumbers.end(), std::back_inserter(filtered), [](int n){ return n <= 1000; });
+    return filtered;
 }
 
-// Filters out numbers greater than 1000
-std::vector<int> StringCalculator::filterLargeNumbers(const std::vector<int>& numbers) {
-    std::vector<int> filtered;
-    std::copy_if(numbers.begin(), numbers.end(), std::back_inserter(filtered), [](int n){ return n <= 1000; });
-    return filtered;
+// Sums up the numbers in the vector
+int StringCalculator::sumNumbers() {
+    return std::accumulate(parsedNumbers.begin(), parsedNumbers.end(), 0);
 }
