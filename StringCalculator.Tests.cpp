@@ -62,3 +62,13 @@ TEST(StringCalculatorAddTests, ExpectSumWithCustomDelimiter) {
 
     ASSERT_EQ(result, expectedresult);
 }
+
+“//[delimiter]\n” for example: “//[***]\n1***2***3” 
+TEST(StringCalculatorAddTests, ExpectSumWithCustomDelimiterString) {
+    int expectedresult = 6;
+    std::string input = "//[***]\n1***2***3";
+    StringCalculator objUnderTest;
+    int result = objUnderTest.add(input);
+
+    ASSERT_EQ(result, expectedresult);
+}
