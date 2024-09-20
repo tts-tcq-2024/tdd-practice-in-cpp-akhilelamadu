@@ -62,20 +62,34 @@ int StringCalculator::toInt(const std::string& number) {
 // Parses the number string into a vector of integers
 void StringCalculator::parseNumbers() {
     parsedNumbers.clear();
-    size_t pos = 0, startPos = 0;
+    size_t startPos = 0;
+    size_t pos = 0;
 
-    while ((pos = numberString.find_first_of(delimiter, startPos)) != std::string::npos) {
-        std::string token = numberString.substr(startPos, pos - startPos);
-        if (!token.empty()) {
-            parsedNumbers.push_back(toInt(token));
-        }
+    // Parse each token from the numberString
+    while ((pos = findNextDelimiter(startPos)) != std::string::npos) {
+        parseSingleNumber(startPos, pos);
         startPos = pos + 1;
     }
 
+    // Handle the last part of the string
     if (startPos < numberString.length()) {
-        parsedNumbers.push_back(toInt(numberString.substr(startPos)));
+        parseSingleNumber(startPos, numberString.length());
     }
 }
+
+// Helper function to find the next delimiter
+size_t StringCalculator::findNextDelimiter(size_t startPos) const {
+    return numberString.find_first_of(delimiter, startPos);
+}
+
+// Helper function to parse and add a single number from the substring
+void StringCalculator::parseSingleNumber(size_t startPos, size_t pos) {
+    std::string token = numberString.substr(startPos, pos - startPos);
+    if (!token.empty()) {
+        parsedNumbers.push_back(toInt(token));
+    }
+}
+
 
 // Validate numbers, checking for negative values
 void StringCalculator::validateNumbers() {

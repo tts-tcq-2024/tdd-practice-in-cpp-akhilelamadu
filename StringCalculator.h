@@ -18,7 +18,12 @@ private:
     void parseInput(const std::string& input);
     void setCustomDelimiter(const std::string& input);
     void extractNumberString(const std::string& input);
-    void parseNumbers();
+    void parseNumbers();  // Updated: now coordinates the parsing
+
+    // Helper functions for parseNumbers to reduce CCN
+    size_t findNextDelimiter(size_t startPos) const;
+    void parseSingleNumber(size_t startPos, size_t pos);
+
     void validateNumbers();
     void checkForNegatives();
     std::vector<int> gatherNegatives() const;
