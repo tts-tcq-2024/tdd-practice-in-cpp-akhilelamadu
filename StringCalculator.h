@@ -21,6 +21,8 @@ private:
     void parseNumbers();
     void validateNumbers();
     void checkForNegatives();
+    std::vector<int> gatherNegatives() const;
+    std::string buildNegativeErrorMessage(const std::vector<int>& negatives) const;
     std::vector<int> filterLargeNumbers();
     int toInt(const std::string& number);
     int sumNumbers();
