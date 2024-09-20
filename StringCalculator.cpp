@@ -34,10 +34,7 @@ void StringCalculator::parseInput(const std::string& input) {
 // Set custom delimiter if provided
 void StringCalculator::setCustomDelimiter(const std::string& input) {
     size_t newlinePos = input.find("\n");
-    if (newlinePos != std::string::npos) {
-        // Extract the delimiter starting from position 2 (after the "//") to the newline character
-        delimiter = input.substr(2, newlinePos - 2);
-    }
+    delimiter = input.substr(2, newlinePos - 2);
 }
 
 // Extract the part of the string with numbers, excluding the delimiter line
