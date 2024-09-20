@@ -11,8 +11,6 @@ int StringCalculator::add(const std::string& numbers) {
     
     parseNumbers();
     validateNumbers();
-    
-    
     parsedNumbers = filterLargeNumbers();
 
     return sumOfNumbers();
