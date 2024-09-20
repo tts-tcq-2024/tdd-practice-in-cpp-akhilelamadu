@@ -34,18 +34,9 @@ void StringCalculator::parseInput(const std::string& input) {
 // Set custom delimiter if provided
 void StringCalculator::setCustomDelimiter(const std::string& input) {
     size_t newlinePos = input.find("\n");
-    std::string delimiterPart = input.substr(2, newlinePos - 2);
-
-    // Handle case with multiple delimiters between square brackets
-    if (delimiterPart[0] == '[') {
-        delimiter.clear();
-        size_t startPos = 1, endPos = 0;
-        while ((endPos = delimiterPart.find(']', startPos)) != std::string::npos) {
-            delimiter += delimiterPart.substr(startPos, endPos - startPos);
-            startPos = endPos + 2;  // skip past "][" or end
-        }
-    } else {
-        delimiter = delimiterPart;  // Single delimiter case
+    if (newlinePos != std::string::npos) {
+        // Extract the delimiter starting from position 2 (after the "//") to the newline character
+        delimiter = input.substr(2, newlinePos - 2);
     }
 }
 
