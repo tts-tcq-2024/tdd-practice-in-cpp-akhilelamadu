@@ -3,27 +3,24 @@
 #include <algorithm>
 #include <numeric>
 
-// Adds up numbers from the input string
 int StringCalculator::add(const std::string& numbers) {
+    
     if (numbers.empty()) return 0;
 
-    // Parse input and extract numbers and delimiters
-    parseInput(numbers);
+    ExtractNumbersAndDelimiters(numbers);
     
-    // Parse and filter numbers
     parseNumbers();
     validateNumbers();
     
-    // Filter large numbers
+    
     parsedNumbers = filterLargeNumbers();
 
-    // Return the sum
-    return sumNumbers();
+    return sumOfNumbers();
 }
 
-// Parse the input string to set delimiter and number string
-void StringCalculator::parseInput(const std::string& input) {
-    if (input.substr(0, 2) == "//") {
+void StringCalculator::ExtractNumbersAndDelimiters(const std::string& input) {
+    
+    if (input.substr(0, 2) == "//") { //checks if there is a custom delimiter
         setCustomDelimiter(input);
         extractNumberString(input);
     } else {
@@ -31,23 +28,20 @@ void StringCalculator::parseInput(const std::string& input) {
     }
 }
 
-// Set custom delimiter if provided
 void StringCalculator::setCustomDelimiter(const std::string& input) {
     size_t newlinePos = input.find("\n");
     delimiter = input.substr(2, newlinePos - 2);
 }
 
-// Extract the part of the string with numbers, excluding the delimiter line
 void StringCalculator::extractNumberString(const std::string& input) {
     numberString = input.substr(input.find("\n") + 1);
 }
 
-// Converts string to an integer
-int StringCalculator::toInt(const std::string& number) {
+int StringCalculator::convertToInt(const std::string& number) {
     return std::stoi(number);
 }
 
-// Parses the number string into a vector of integers
+
 void StringCalculator::parseNumbers() {
     parsedNumbers.clear();
     size_t startPos = 0;
@@ -65,26 +59,22 @@ void StringCalculator::parseNumbers() {
     }
 }
 
-// Helper function to find the next delimiter
 size_t StringCalculator::findNextDelimiter(size_t startPos) const {
     return numberString.find_first_of(delimiter, startPos);
 }
 
-// Helper function to parse and add a single number from the substring
 void StringCalculator::parseSingleNumber(size_t startPos, size_t pos) {
     std::string token = numberString.substr(startPos, pos - startPos);
     if (!token.empty()) {
-        parsedNumbers.push_back(toInt(token));
+        parsedNumbers.push_back(convertToInt(token));
     }
 }
 
 
-// Validate numbers, checking for negative values
 void StringCalculator::validateNumbers() {
     checkForNegatives();
 }
 
-// Check for negative numbers and throw an exception if any are found
 void StringCalculator::checkForNegatives() {
     std::vector<int> negatives = gatherNegatives();
 
@@ -93,7 +83,6 @@ void StringCalculator::checkForNegatives() {
     }
 }
 
-// Gather all negative numbers from parsedNumbers
 std::vector<int> StringCalculator::gatherNegatives() const {
     std::vector<int> negatives;
     for (int num : parsedNumbers) {
@@ -104,7 +93,6 @@ std::vector<int> StringCalculator::gatherNegatives() const {
     return negatives;
 }
 
-// Build the error message for negative numbers
 std::string StringCalculator::buildNegativeErrorMessage(const std::vector<int>& negatives) const {
     std::string errorMsg = "negatives not allowed: ";
     for (int neg : negatives) {
@@ -113,14 +101,12 @@ std::string StringCalculator::buildNegativeErrorMessage(const std::vector<int>& 
     return errorMsg;
 }
 
-// Filters out numbers greater than 1000
 std::vector<int> StringCalculator::filterLargeNumbers() {
     std::vector<int> filtered;
     std::copy_if(parsedNumbers.begin(), parsedNumbers.end(), std::back_inserter(filtered), [](int n){ return n <= 1000; });
     return filtered;
 }
 
-// Sums up the numbers in the vector
-int StringCalculator::sumNumbers() {
+int StringCalculator::sumOfNumbers() {
     return std::accumulate(parsedNumbers.begin(), parsedNumbers.end(), 0);
 }
